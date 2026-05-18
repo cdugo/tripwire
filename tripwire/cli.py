@@ -8,6 +8,7 @@ Two subcommands:
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 from pathlib import Path
 
@@ -82,15 +83,21 @@ def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="tripwire")
     sub = p.add_subparsers(dest="cmd", required=True)
 
+    # Defaults honour TRIPWIRE_REPORT_DIR / TRIPWIRE_STATE_DB if set so the
+    # docker entrypoint (which exports both to /data/...) Just Works without
+    # the caller having to re-pass them after `docker compose run`.
+    default_report_dir = Path(os.environ.get("TRIPWIRE_REPORT_DIR", "./reports"))
+    default_state_db = Path(os.environ.get("TRIPWIRE_STATE_DB", "./tripwire.sqlite"))
+
     demo = sub.add_parser("demo", help="offline dry-run against fakes")
-    demo.add_argument("--report-dir", type=Path, default=Path("./reports"))
-    demo.add_argument("--state-db", type=Path, default=Path("./tripwire.sqlite"))
+    demo.add_argument("--report-dir", type=Path, default=default_report_dir)
+    demo.add_argument("--state-db", type=Path, default=default_state_db)
     demo.add_argument("--cycle", type=int, default=1)
     demo.set_defaults(func=_cmd_demo)
 
     live = sub.add_parser("live", help="real pipeline against the fork")
-    live.add_argument("--report-dir", type=Path, default=Path("./reports"))
-    live.add_argument("--state-db", type=Path, default=Path("./tripwire.sqlite"))
+    live.add_argument("--report-dir", type=Path, default=default_report_dir)
+    live.add_argument("--state-db", type=Path, default=default_state_db)
     live.add_argument("--cycle", type=int, default=1)
     live.add_argument("--wall-clock-cap-seconds", type=float, default=3600.0)
     live.set_defaults(func=_cmd_live)

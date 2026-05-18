@@ -10,9 +10,11 @@ services:
   tripwire:
     build: .
     image: tripwire:latest
+    # `demo` doesn't need credentials, but compose still requires the file to
+    # exist when env_file is declared. If you're running demo on a fresh
+    # checkout, `touch .env` once and you're done.
     env_file:
-      - path: .env
-        required: false
+      - .env
     volumes:
       - ./data/tripwire.sqlite:/data/tripwire.sqlite
       - ./data/reports:/data/reports
