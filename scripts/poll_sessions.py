@@ -13,8 +13,34 @@ from pathlib import Path
 
 import httpx
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+REPO_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(REPO_ROOT))
 from tripwire.store import Store  # noqa: E402
+
+
+def _load_dotenv(path: Path) -> None:
+    """Tiny .env loader so the script Just Works without `source .env`."""
+    if not path.exists():
+        return
+    for raw in path.read_text().splitlines():
+        line = raw.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, _, value = line.partition("=")
+        os.environ.setdefault(key.strip(), value.strip().strip('"').strip("'"))
+
+
+_load_dotenv(REPO_ROOT / ".env")
+
+_REQUIRED = ("DEVIN_ORG_ID", "DEVIN_API_KEY")
+_missing = [k for k in _REQUIRED if not os.environ.get(k)]
+if _missing:
+    print(
+        "error: missing env var(s): " + ", ".join(_missing) +
+        "\n       populate .env (see .env.example) or `export` them in your shell.",
+        file=sys.stderr,
+    )
+    sys.exit(2)
 
 DB = Path(sys.argv[1]) if len(sys.argv) > 1 else Path("./tripwire.sqlite")
 INTERVAL_S = int(sys.argv[2]) if len(sys.argv) > 2 else 75
