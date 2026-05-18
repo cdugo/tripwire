@@ -20,8 +20,34 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+REPO_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(REPO_ROOT))
 from tripwire.live_config import LIVE_MANIFESTS  # noqa: E402
+
+
+def _load_dotenv(path: Path) -> None:
+    """Tiny .env loader so the script Just Works without `source .env`."""
+    if not path.exists():
+        return
+    for raw in path.read_text().splitlines():
+        line = raw.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, _, value = line.partition("=")
+        os.environ.setdefault(key.strip(), value.strip().strip('"').strip("'"))
+
+
+_load_dotenv(REPO_ROOT / ".env")
+
+_REQUIRED = ("GITHUB_OWNER", "GITHUB_REPO", "GITHUB_PAT")
+_missing = [k for k in _REQUIRED if not os.environ.get(k)]
+if _missing:
+    print(
+        "error: missing env var(s): " + ", ".join(_missing) +
+        "\n       populate .env (see .env.example) or `export` them in your shell.",
+        file=sys.stderr,
+    )
+    sys.exit(2)
 
 OWNER = os.environ["GITHUB_OWNER"]
 REPO = os.environ["GITHUB_REPO"]
