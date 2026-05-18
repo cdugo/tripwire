@@ -213,5 +213,3 @@ reports/                 generated; per-cycle + rolling HTML
 - Per-finding eligibility / approval gate with customer policy.
 - CI hardening on the customer fork so Devin's CI-watch loop has clean signal.
 - Fleet-wide rollout via config-driven manifest slates per repo.
-- Why this instead of Devin's native Automations: the brief asks us to own
-  the dispatch logic, metrics, and escalation rules — so we do.
