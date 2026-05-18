@@ -1,0 +1,5 @@
+{
+  "prompt": "Remediate the supply-chain advisories in manifest fixtures/tripwire/web-dashboard/package.json on the cdugo/superset repository, branch tripwire/demo.\n\nFINDINGS (remediate all of them in one PR)\n  - marked (npm) installed version 4.0.0\n      vulnerable: < 4.0.10\n      advisories: GHSA-5v2h-r2cx-5xgj, GHSA-rrrm-qjm4-v8hf\n\nTASK\n  Open one PR against tripwire/demo on branch remediate/web-dashboard\n  that removes every resolved version inside a vulnerable range. The\n  repository is the cdugo/superset fork (https://github.com/cdugo/superset).\n  This is a confirmation session for the Tripwire pipeline; on completion,\n  report your terminal status so the orchestrator can record timing.\n\nFollow the org Playbook 'tripwire-remediate-manifest' for the preference order\nand acceptance criteria. Follow the Knowledge note 'tripwire-fixtures-conventions'\nfor install/build commands and base-branch conventions.",
+  "playbook_id": "playbook-c273632075014fdcb977d5d8fd6514d0",
+  "knowledge_ids": ["note-993fff1cc53f48be8296cf3a99114193"]
+}

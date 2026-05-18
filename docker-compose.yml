@@ -1,0 +1,20 @@
+# Single-service compose.
+#
+#   docker compose run --rm tripwire demo          # offline, no .env, fixture-backed
+#   docker compose run --rm tripwire live          # real pipeline; needs .env
+#
+# SQLite is a bind-mounted FILE (not a Docker volume) so the state survives
+# `docker compose down` and reviewer-friendly clean-room runs.
+
+services:
+  tripwire:
+    build: .
+    image: tripwire:latest
+    env_file:
+      - path: .env
+        required: false
+    volumes:
+      - ./data/tripwire.sqlite:/data/tripwire.sqlite
+      - ./data/reports:/data/reports
+    # ENTRYPOINT in the Dockerfile is `python -m tripwire`. Pass the
+    # subcommand at the CLI: `docker compose run --rm tripwire demo`.
